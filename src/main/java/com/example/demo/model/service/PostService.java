@@ -3,6 +3,8 @@ package com.example.demo.model.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,8 +27,20 @@ public class PostService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public List<Post> findAll() { // 전체 목록 (최신 글이 위로)
+    public List<Post> findAll() { // 전체 목록 (최신 글이 위로) — 9주차 (10주차부터는 findPage 사용)
         return postRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    public static final int PAGE_SIZE = 10; // [10주차] 한 페이지에 보여 줄 글 수
+
+    // [10주차] 단계 1 · 2 : 페이지 목록 + 검색 (page 는 0 부터, 검색어가 없으면 전체)
+    public Page<Post> findPage(String keyword, int page) {
+        PageRequest pageable = PageRequest.of(Math.max(page, 0), PAGE_SIZE, // ?page=-1 같은 이상한 값 → 0
+                                              Sort.by(Sort.Direction.DESC, "id")); // 최신 글이 위로
+        if (keyword == null || keyword.isBlank()) { // 앞이 true 면 뒤를 실행하지 않음 (null 안전)
+            return postRepository.findAll(pageable); // SELECT ... ORDER BY id DESC LIMIT 10 OFFSET page*10
+        }
+        return postRepository.search(keyword.trim(), pageable); // 검색 결과도 10개씩
     }
 
     public Post findById(Long id) { // 글 1개 (없으면 404 → templates/error/404.html)

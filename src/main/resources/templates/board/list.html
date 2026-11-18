@@ -26,13 +26,24 @@
                         <div class="d-flex align-items-center border-bottom mb-4 pb-3">
                             <!-- listTitle : 연습문제 ② "내가 쓴 글" 에서 제목만 바꿔 재사용 -->
                             <h2 class="mb-0"><i class="bi-card-list me-2"></i><span th:text="${listTitle ?: '게시판'}">게시판</span></h2>
-                            <span class="ms-3 text-muted" th:text="|전체 ${posts.size()}개|">전체 0개</span>
+                            <!-- [10주차] page.totalElements : 전체 글 수 (count SQL) -->
+                            <span class="ms-3 text-muted" th:text="${page != null} ? |전체 ${page.totalElements}개| : |전체 ${posts.size()}개|">전체 0개</span>
                             <!-- 글쓰기 버튼 : 로그인한 사람에게만 (화면 숨김) + /board/write 는 URL 규칙으로도 로그인 필요 -->
                             <a sec:authorize="isAuthenticated()" th:href="@{/board/write}"
                                class="custom-btn btn ms-auto"><i class="bi-pencil me-1"></i>글쓰기</a>
                         </div>
 
                         <div th:if="${param.deleted}" class="alert alert-success">글이 삭제되었습니다.</div>
+
+                        <!-- [10주차] 검색창 : GET /board?keyword=... (검색어는 서버가 다시 넘겨 줘서 유지된다) -->
+                        <form th:action="@{/board}" method="get" class="board-search">
+                            <input type="text" name="keyword" class="form-control" placeholder="제목 또는 내용 검색"
+                                   th:value="${keyword}">
+                            <button type="submit" class="custom-btn btn"><i class="bi-search me-1"></i>검색</button>
+                            <a th:if="${keyword != null and !keyword.isBlank()}" th:href="@{/board}" class="ms-2">전체 보기</a>
+                        </form>
+                        <p th:if="${keyword != null and !keyword.isBlank()}" class="text-muted small mb-3"
+                           th:text="|'${keyword}' 검색 결과 ${page.totalElements}개|">검색 결과</p>
 
                         <table class="table align-middle board-table" th:if="${!posts.isEmpty()}">
                             <thead>
@@ -41,7 +52,12 @@
                             <tbody>
                                 <tr th:each="post : ${posts}">
                                     <td class="num" th:text="${post.id}">1</td>
-                                    <td class="title"><a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a></td>
+                                    <td class="title">
+                                        <a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
+                                        <!-- [10주차] 단계 5 : 댓글 수 (@OneToMany comments 가 있어야 동작, 글마다 SQL 1번 → N+1) -->
+                                        <span th:if="${post.comments.size() > 0}" class="comment-count"
+                                              th:text="|[${post.comments.size()}]|">[3]</span>
+                                    </td>
                                     <!-- 글 → 작성자(Member) → 이름 : @ManyToOne 덕분 -->
                                     <td class="writer" th:text="${post.author.name}">작성자</td>
                                     <td class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2026-11-18</td>
@@ -49,7 +65,24 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div th:if="${posts.isEmpty()}" class="board-empty">아직 글이 없습니다. 첫 글을 써 보세요!</div>
+                        <div th:if="${posts.isEmpty()}" class="board-empty"
+                             th:text="${keyword != null and !keyword.isBlank()} ? '검색 결과가 없습니다.' : '아직 글이 없습니다. 첫 글을 써 보세요!'">아직 글이 없습니다.</div>
+
+                        <!-- [10주차] 페이지 번호 : 화면은 1 부터, 주소(page)는 0 부터 / 검색어가 있으면 링크에도 붙인다 -->
+                        <nav th:if="${page != null and page.totalPages > 1}" class="board-paging"
+                             th:with="hasKw=${keyword != null and !keyword.isBlank()},
+                                      start=${(page.number / 10) * 10},
+                                      end=${T(java.lang.Math).min(start + 9, page.totalPages - 1)}">
+                            <a th:classappend="${page.first} ? 'disabled'"
+                               th:href="${hasKw} ? @{/board(page=${page.number - 1}, keyword=${keyword})} : @{/board(page=${page.number - 1})}">이전</a>
+                            <a th:each="i : ${#numbers.sequence(start, end)}"
+                               th:classappend="${i == page.number} ? 'active'"
+                               th:href="${hasKw} ? @{/board(page=${i}, keyword=${keyword})} : @{/board(page=${i})}"
+                               th:text="${i + 1}">1</a>
+                            <a th:classappend="${page.last} ? 'disabled'"
+                               th:href="${hasKw} ? @{/board(page=${page.number + 1}, keyword=${keyword})} : @{/board(page=${page.number + 1})}">다음</a>
+                            <span class="page-info" th:text="|${page.number + 1} / ${page.totalPages} 페이지|">1 / 11 페이지</span>
+                        </nav>
                     </div>
                 </div>
             </div>

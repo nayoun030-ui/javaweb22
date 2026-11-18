@@ -54,6 +54,42 @@
                                 </form>
                             </div>
                         </div>
+
+                        <!-- [10주차] 댓글 영역 : 컨트롤러가 comments 를 넘길 때 나타난다 / #comments = 페이지 안의 위치 -->
+                        <section id="comments" class="comments" th:if="${comments != null}">
+                            <h5 class="mb-2"><i class="bi-chat-dots me-2"></i>댓글 <span th:text="${comments.size()}">0</span></h5>
+
+                            <div th:if="${param.commentError}" class="alert alert-danger py-2">댓글은 1~500자로 입력하세요.</div>
+                            <div th:if="${param.commentDeleted}" class="alert alert-success py-2">댓글이 삭제되었습니다.</div>
+
+                            <!-- 오래된 댓글이 위 (findByPostOrderByIdAsc) -->
+                            <div th:each="c : ${comments}" class="comment-item"
+                                 th:with="isCommentWriter=${#authorization.expression('isAuthenticated()') and #authentication.name == c.author.username}">
+                                <div class="meta">
+                                    <strong th:text="${c.author.name}">작성자</strong>
+                                    <span th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}">시간</span>
+                                    <!-- 삭제 : 댓글 본인 또는 관리자 (글 주인이라도 남의 댓글은 삭제 불가) -->
+                                    <form th:if="${isCommentWriter or isAdmin}"
+                                          th:action="@{/board/{postId}/comments/{id}/delete(postId=${post.id}, id=${c.id})}"
+                                          method="post" onsubmit="return confirm('댓글을 삭제할까요?');">
+                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0"
+                                                th:text="${isCommentWriter} ? '삭제' : '관리자 삭제'">삭제</button>
+                                    </form>
+                                </div>
+                                <div class="body" th:text="${c.content}">댓글 내용</div>
+                            </div>
+                            <p th:if="${comments.isEmpty()}" class="text-muted my-3">첫 댓글을 남겨 보세요.</p>
+
+                            <!-- 댓글 쓰기 : POST /board/{id}/comments (로그인 필요) -->
+                            <form sec:authorize="isAuthenticated()" th:action="@{/board/{id}/comments(id=${post.id})}"
+                                  method="post" class="comment-form">
+                                <textarea name="content" class="form-control" maxlength="500" placeholder="댓글을 입력하세요 (500자까지)"></textarea>
+                                <button type="submit" class="custom-btn btn">등록</button>
+                            </form>
+                            <p sec:authorize="isAnonymous()" class="text-muted mt-3 mb-0">
+                                <a th:href="@{/login}">로그인</a>하면 댓글을 쓸 수 있습니다.
+                            </p>
+                        </section>
                     </div>
                 </div>
             </div>

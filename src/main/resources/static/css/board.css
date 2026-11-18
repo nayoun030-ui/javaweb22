@@ -17,3 +17,24 @@
 .post-actions form { margin: 0; }
 
 .board-form textarea { min-height: 280px; }
+
+/* [10주차] 검색 · 페이지 번호 · 댓글 */
+.board-search { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.board-search .form-control { max-width: 320px; }
+.board-paging { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 24px; }
+.board-paging a { min-width: 36px; padding: 6px 10px; text-align: center; border: 1px solid var(--border-color);
+                  border-radius: 8px; color: var(--p-color); }
+.board-paging a.active { background: var(--primary-color); border-color: var(--primary-color); color: #fff; font-weight: 700; }
+.board-paging a.disabled { pointer-events: none; opacity: .4; }
+.board-paging .page-info { margin-left: 12px; color: var(--p-color); font-size: 14px; }
+.comment-count { color: var(--secondary-color); font-weight: 700; font-size: 14px; margin-left: 4px; }
+
+.comments { margin-top: 32px; }
+.comment-item { padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+.comment-item .meta { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--p-color); }
+.comment-item .meta strong { color: var(--dark-color); }
+.comment-item .body { white-space: pre-wrap; margin-top: 6px; }
+.comment-item form { margin: 0 0 0 auto; }
+.comment-form { display: flex; gap: 8px; margin-top: 16px; }
+.comment-form textarea { min-height: 60px; }
+.comment-form button { flex-shrink: 0; white-space: nowrap; align-self: flex-end; } /* "등/록" 줄바꿈 · 동그랗게 늘어남 방지 */
