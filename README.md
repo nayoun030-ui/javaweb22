@@ -24,7 +24,8 @@ Spring Boot 기반 개인 포트폴리오 웹 사이트 — 주차별 실습 결
 - [x] 2주차 : 개발 환경 설정 및 테스트 (프로젝트 생성)
 - [x] 4주차 : MySQL 연결 확인 (HikariPool Start completed), DB 계정 정보 분리
 - [x] 2주차 : index.html / hello 페이지, URL 매핑 + 연습문제 hello2 (값 5개 출력)
-- [ ] 3주차 : 포트폴리오 프론트 (부트스트랩 템플릿)
+- [x] 3주차 : 포트폴리오 프론트 (TemplateMo 578 First Portfolio, Bootstrap 5) 적용, 정적 자원 경로 Thymeleaf `@{...}` 변환
+- [ ] 3주차 : 내 정보로 내용 수정 (Hero · About · Services), 상세 페이지 detailed_web.html
 - [ ] 4주차 : TestDB 엔티티 · 리포지토리 · 서비스 · 컨트롤러
 - [ ] 5주차 : 로그인 / 로그아웃, 비밀번호 암호화 (BCrypt)
 - [ ] 6주차 : 권한(ROLE) 접근 제어, 관리자 페이지
