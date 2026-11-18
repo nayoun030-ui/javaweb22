@@ -29,7 +29,8 @@ Spring Boot 기반 개인 포트폴리오 웹 사이트 — 주차별 실습 결
 - [ ] 3주차 연습문제 : 나머지 서비스 3개(AI · 디자인 · 앱) 상세 페이지, 프로필 사진 교체
 - [x] 4주차 : MVC 폴더 구조(controller · model/domain · repository · service), TestDB 엔티티 · 리포지토리 · 서비스, `/testdb` 회원 목록(th:each)
 - [ ] 4주차 연습문제 : 나이 · 성별 컬럼 추가, INSERT 후 testdb.html 출력
-- [ ] 5주차 : 로그인 / 로그아웃, 비밀번호 암호화 (BCrypt)
+- [x] 5주차 : Spring Security 로그인 / 로그아웃, 회원가입, 비밀번호 암호화 (BCrypt), 메뉴 로그인 상태 표시 (sec:authorize)
+- [ ] 5주차 연습문제 : ① 로그인 상태 유지 (remember-me) ② 비밀번호 확인 검증
 - [ ] 6주차 : 권한(ROLE) 접근 제어, 관리자 페이지
 - [ ] 7주차 : 회원 관리 REST API (JSON)
 - [ ] 9주차 : 게시판 CRUD + 본인 확인

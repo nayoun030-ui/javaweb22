@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로그인 | 김나연</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <style>
+        /* 템플릿 CSS 는 모든 체크박스를 큰 타일(Contact 서비스 선택용)로 그린다 → 로그인 화면만 일반 체크박스로 되돌림 */
+        .remember-check { padding-left: 1.6em; }
+        .remember-check .form-check-input[type=checkbox] {
+            width: 1.1em; height: 1.1em; padding: 0; margin: .25em 0 0 -1.6em; border-width: 1px;
+        }
+        .remember-check .form-check-input:checked { background-color: var(--secondary-color); }
+        .custom-form .remember-check .form-check-label { position: static; transform: none; }
+    </style>
+</head>
+<body>
+    <main class="section-padding d-flex align-items-center" style="min-height: 100vh;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-md-8 col-12 mx-auto">
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0"><i class="bi-person-circle me-2"></i>로그인</h2>
+                            <a th:href="@{/}" class="ms-auto">메인으로</a>
+                        </div>
+
+                        <!-- 주소 파라미터에 따른 안내 메시지 -->
+                        <div th:if="${param.error}" class="alert alert-danger">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+                        <div th:if="${param.logout}" class="alert alert-success">로그아웃 되었습니다.</div>
+                        <div th:if="${param.signup}" class="alert alert-success">회원가입이 완료되었습니다. 로그인해 주세요.</div>
+
+                        <!-- th:action : 시큐리티가 숨은 _csrf 토큰을 자동 삽입 (action 만 쓰면 403) -->
+                        <form th:action="@{/login}" method="post" class="custom-form">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="username" id="username" class="form-control" placeholder="아이디" required>
+                                <label for="username">아이디</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" name="password" id="password" class="form-control" placeholder="비밀번호" required>
+                                <label for="password">비밀번호</label>
+                            </div>
+                            <!-- [5주차 연습문제 ①] remember-me : SecurityConfig 에 .rememberMe() 를 추가하면 동작 -->
+                            <div class="form-check remember-check mb-3">
+                                <input type="checkbox" name="remember-me" id="remember-me" class="form-check-input">
+                                <label for="remember-me" class="form-check-label">로그인 상태 유지</label>
+                            </div>
+                            <button type="submit" class="form-control">로그인</button>
+                        </form>
+
+                        <p class="mt-4 mb-0 text-center">아직 회원이 아니신가요? <a th:href="@{/signup}">회원가입</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
