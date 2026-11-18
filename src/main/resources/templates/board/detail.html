@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- |...| 리터럴 치환 안에는 | 문자를 쓸 수 없다 → 문자열 연결(+) 사용 -->
+    <title th:text="${post.title} + ' - 게시판'">글 - 게시판</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <link th:href="@{/css/board.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-12 mx-auto">
+                    <div class="board-bar">
+                        <a th:href="@{/}" class="brand">Nayeon</a>
+                        <a th:href="@{/board}">게시판</a>
+                        <span class="ms-auto" sec:authorize="isAuthenticated()"><strong sec:authentication="name">student1</strong>님</span>
+                        <a class="ms-auto" sec:authorize="isAnonymous()" th:href="@{/login}">로그인</a>
+                    </div>
+
+                    <div class="services-thumb"
+                         th:with="isWriter=${#authorization.expression('isAuthenticated()') and #authentication.name == post.author.username},
+                                  isAdmin=${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <div class="border-bottom mb-2 pb-3">
+                            <h2 class="mb-3" th:text="${post.title}">제목</h2>
+                            <div class="post-meta">
+                                <span><i class="bi-person me-1"></i><span th:text="${post.author.name}">작성자</span></span>
+                                <span><i class="bi-clock me-1"></i><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span></span>
+                                <span th:if="${post.updatedAt != null}">
+                                    수정 <span th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">수정일</span>
+                                </span>
+                                <span><i class="bi-eye me-1"></i>조회 <span th:text="${post.viewCount}">0</span></span>
+                            </div>
+                        </div>
+
+                        <!-- th:text : 글 안의 <script> 도 글자로 출력 (XSS 방지) / pre-wrap : 줄바꿈 유지 -->
+                        <div class="post-content" th:text="${post.content}">내용</div>
+
+                        <div class="d-flex align-items-center border-top pt-3">
+                            <a th:href="@{/board}" class="custom-btn custom-border-btn btn">목록</a>
+                            <div class="post-actions ms-auto">
+                                <!-- 버튼은 화면에서 숨길 뿐 → 서버(PostService.checkWriter)가 한 번 더 확인 -->
+                                <a th:if="${isWriter}" th:href="@{/board/{id}/edit(id=${post.id})}"
+                                   class="custom-btn custom-border-btn btn">수정</a>
+                                <form th:if="${isWriter or isAdmin}" th:action="@{/board/{id}/delete(id=${post.id})}" method="post"
+                                      onsubmit="return confirm('정말 삭제할까요?');">
+                                    <button type="submit" class="custom-btn btn"
+                                            th:text="${isWriter} ? '삭제' : '관리자 삭제'">삭제</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

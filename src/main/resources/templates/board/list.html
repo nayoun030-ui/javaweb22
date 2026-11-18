@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>게시판 | 김나연</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <link th:href="@{/css/board.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-12 mx-auto">
+                    <div class="board-bar">
+                        <a th:href="@{/}" class="brand">Nayeon</a>
+                        <a th:href="@{/board}">게시판</a>
+                        <span class="ms-auto" sec:authorize="isAuthenticated()"><strong sec:authentication="name">student1</strong>님</span>
+                        <a class="ms-auto" sec:authorize="isAnonymous()" th:href="@{/login}">로그인</a>
+                    </div>
+
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <!-- listTitle : 연습문제 ② "내가 쓴 글" 에서 제목만 바꿔 재사용 -->
+                            <h2 class="mb-0"><i class="bi-card-list me-2"></i><span th:text="${listTitle ?: '게시판'}">게시판</span></h2>
+                            <span class="ms-3 text-muted" th:text="|전체 ${posts.size()}개|">전체 0개</span>
+                            <!-- 글쓰기 버튼 : 로그인한 사람에게만 (화면 숨김) + /board/write 는 URL 규칙으로도 로그인 필요 -->
+                            <a sec:authorize="isAuthenticated()" th:href="@{/board/write}"
+                               class="custom-btn btn ms-auto"><i class="bi-pencil me-1"></i>글쓰기</a>
+                        </div>
+
+                        <div th:if="${param.deleted}" class="alert alert-success">글이 삭제되었습니다.</div>
+
+                        <table class="table align-middle board-table" th:if="${!posts.isEmpty()}">
+                            <thead>
+                                <tr><th class="num">번호</th><th>제목</th><th class="writer">작성자</th><th class="date">작성일</th><th class="views">조회</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="post : ${posts}">
+                                    <td class="num" th:text="${post.id}">1</td>
+                                    <td class="title"><a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a></td>
+                                    <!-- 글 → 작성자(Member) → 이름 : @ManyToOne 덕분 -->
+                                    <td class="writer" th:text="${post.author.name}">작성자</td>
+                                    <td class="date" th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2026-11-18</td>
+                                    <td class="views" th:text="${post.viewCount}">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div th:if="${posts.isEmpty()}" class="board-empty">아직 글이 없습니다. 첫 글을 써 보세요!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${postId != null} ? '글 수정 | 게시판' : '글쓰기 | 게시판'">글쓰기 | 게시판</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <link th:href="@{/css/board.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-12 mx-auto">
+                    <div class="board-bar">
+                        <a th:href="@{/}" class="brand">Nayeon</a>
+                        <a th:href="@{/board}">게시판</a>
+                        <span class="ms-auto"><strong sec:authentication="name">student1</strong>님</span>
+                    </div>
+
+                    <!-- 화면 하나를 postId 유무로 나눠 쓴다 : 없으면 글쓰기, 있으면 수정 -->
+                    <div class="services-thumb" th:with="editMode=${postId != null}">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0"><i class="bi-pencil-square me-2"></i><span th:text="${editMode} ? '글 수정' : '글쓰기'">글쓰기</span></h2>
+                        </div>
+
+                        <div th:if="${error}" th:text="${error}" class="alert alert-danger"></div>
+
+                        <!-- 폼 전송 주소 : 글쓰기 POST /board/write , 수정 POST /board/{id}/edit -->
+                        <form th:action="${editMode} ? @{/board/{id}/edit(id=${postId})} : @{/board/write}"
+                              method="post" class="custom-form board-form">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="title" id="title" class="form-control" placeholder="제목" maxlength="100"
+                                       th:value="${postForm?.title}">
+                                <label for="title">제목 (100자까지)</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea name="content" id="content" class="form-control" placeholder="내용"
+                                          th:text="${postForm?.content}"></textarea>
+                                <label for="content">내용</label>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a th:href="${editMode} ? @{/board/{id}(id=${postId})} : @{/board}" class="custom-btn custom-border-btn btn">취소</a>
+                                <button type="submit" class="custom-btn btn" th:text="${editMode} ? '수정 완료' : '등록'">등록</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

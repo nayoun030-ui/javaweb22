@@ -30,6 +30,8 @@ public class SecurityConfig {
                                  "/login", "/signup", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**").permitAll() // 빠지면 디자인 깨짐
                 .requestMatchers("/api/hello").permitAll() // [7주차] 첫 번째 API : 누구나
+                // [9주차] 게시판 목록·상세 : 누구나 ({id:\d+} = 숫자만 → /board/write 는 포함 안 됨, 로그인 필요)
+                .requestMatchers("/board", "/board/{id:\\d+}").permitAll()
                 // [6주차] 관리자만 (1차 잠금, anyRequest 보다 위에!) + [7주차] 새 주소를 만들면 접근 규칙도 바로 추가
                 .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()) // 나머지 전부 로그인 필요 → /testdb, /mypage
