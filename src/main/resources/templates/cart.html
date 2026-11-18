@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>신청 바구니 | 김나연</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <link th:href="@{/css/board.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-12 mx-auto">
+                    <div class="board-bar">
+                        <a th:href="@{/}" class="brand">Nayeon</a>
+                        <a th:href="@{/board}">게시판</a>
+                        <a th:href="@{/cart}">신청 바구니 <span class="badge rounded-pill bg-secondary" th:text="${cartCount}">0</span></a>
+                        <span class="ms-auto"><strong sec:authentication="name">student1</strong>님</span>
+                    </div>
+
+                    <!-- 신청 바구니 (세션) : 번호만 담고, 남은 자리는 볼 때마다 DB 에서 새로 -->
+                    <div class="services-thumb mb-4">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0"><i class="bi-basket me-2"></i>신청 바구니</h2>
+                            <span class="ms-3 text-muted" th:text="|${cartPosts.size()}개|">0개</span>
+                        </div>
+
+                        <!-- redirect 후 1회만 표시 (flash) -->
+                        <div th:if="${message}" th:text="${message}" class="alert alert-success"></div>
+                        <div th:if="${error}" th:text="${error}" class="alert alert-danger"></div>
+
+                        <table class="table align-middle board-table cart-table" th:unless="${cartPosts.isEmpty()}">
+                            <thead>
+                                <tr><th>모집글</th><th class="views">정원</th><th class="views">신청</th><th class="views">남은 자리</th><th class="views">빼기</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${cartPosts}">
+                                    <td class="title"><a th:href="@{/board/{id}(id=${p.id})}" th:text="${p.title}">모집글</a></td>
+                                    <td class="views" th:text="${p.capacity}">5</td>
+                                    <td class="views" th:text="${p.appliedCount}">0</td>
+                                    <td class="views remaining" th:classappend="${p.full} ? 'full'"
+                                        th:text="${p.full} ? '마감' : ${p.remaining}">5</td>
+                                    <td class="views">
+                                        <form th:action="@{/cart/{id}/remove(id=${p.id})}" method="post" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">빼기</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div th:if="${cartPosts.isEmpty()}" class="board-empty">바구니가 비어 있습니다. 모집글 상세에서 "바구니 담기"를 눌러 보세요.</div>
+
+                        <!-- 신청 확정 : POST /cart/confirm → @Transactional (하나라도 실패하면 모두 취소) -->
+                        <form th:unless="${cartPosts.isEmpty()}" th:action="@{/cart/confirm}" method="post" class="text-end mt-3">
+                            <button type="submit" class="custom-btn btn"><i class="bi-check2-circle me-1"></i>모두 신청 확정</button>
+                        </form>
+                    </div>
+
+                    <!-- 내 신청 내역 (DB : enrollments) -->
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h4 class="mb-0"><i class="bi-journal-check me-2"></i>내 신청 내역</h4>
+                            <span class="ms-3 text-muted" th:text="|${enrollments.size()}건|">0건</span>
+                        </div>
+                        <table class="table align-middle board-table" th:unless="${enrollments.isEmpty()}">
+                            <thead><tr><th>모집글</th><th class="views">신청 인원</th><th class="date">신청 시간</th></tr></thead>
+                            <tbody>
+                                <tr th:each="e : ${enrollments}">
+                                    <td class="title"><a th:href="@{/board/{id}(id=${e.post.id})}" th:text="${e.post.title}">모집글</a></td>
+                                    <td class="views" th:text="|${e.post.appliedCount}/${e.post.capacity}|">1/5</td>
+                                    <td class="date" th:text="${#temporals.format(e.createdAt, 'yyyy-MM-dd HH:mm')}">시간</td>
+                                    <!-- [11주차 연습문제 ①] 신청 취소 버튼 : POST /cart/enrollments/{id}/cancel -->
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div th:if="${enrollments.isEmpty()}" class="board-empty">아직 신청한 모집글이 없습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

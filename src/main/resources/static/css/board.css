@@ -37,4 +37,19 @@
 .comment-item form { margin: 0 0 0 auto; }
 .comment-form { display: flex; gap: 8px; margin-top: 16px; }
 .comment-form textarea { min-height: 60px; }
+/* [11주차] 모집글 · 포스터 · 바구니 */
+.recruit-badge { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;
+                 background: var(--secondary-color); color: #fff; vertical-align: middle; }
+.recruit-badge.full { background: #adb5bd; }
+.post-poster { margin: 24px 0 8px; text-align: center; }
+.post-poster img { max-width: 100%; max-height: 520px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.recruit-box { margin: 24px 0 8px; padding: 20px 24px; border: 1px solid var(--border-color); border-radius: 12px; background: #f8f9fa; }
+.recruit-stats { display: flex; gap: 32px; }
+.recruit-stats span { display: block; font-size: 13px; color: var(--p-color); }
+.recruit-stats strong { font-size: 28px; color: var(--dark-color); }
+.recruit-box .progress { height: 18px; }
+.recruit-box .progress-bar { background: var(--secondary-color); font-size: 12px; }
+.recruit-fields { padding: 20px; border: 1px dashed var(--border-color); border-radius: 12px; }
+.cart-table .remaining.full { color: #dc3545; font-weight: 700; }
+
 .comment-form button { flex-shrink: 0; white-space: nowrap; align-self: flex-end; } /* "등/록" 줄바꿈 · 동그랗게 늘어남 방지 */

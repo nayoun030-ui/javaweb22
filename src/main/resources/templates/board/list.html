@@ -18,6 +18,8 @@
                     <div class="board-bar">
                         <a th:href="@{/}" class="brand">Nayeon</a>
                         <a th:href="@{/board}">게시판</a>
+                        <!-- [11주차] 신청 바구니 + 배지 (세션에 담긴 모집글 수) -->
+                        <a sec:authorize="isAuthenticated()" th:href="@{/cart}">신청 바구니 <span class="badge rounded-pill bg-secondary" th:text="${cartCount}">0</span></a>
                         <span class="ms-auto" sec:authorize="isAuthenticated()"><strong sec:authentication="name">student1</strong>님</span>
                         <a class="ms-auto" sec:authorize="isAnonymous()" th:href="@{/login}">로그인</a>
                     </div>
@@ -53,6 +55,10 @@
                                 <tr th:each="post : ${posts}">
                                     <td class="num" th:text="${post.id}">1</td>
                                     <td class="title">
+                                        <!-- [11주차] 모집글 : 제목 앞 "모집 0/5" 또는 "마감" -->
+                                        <span th:if="${post.recruit}" class="recruit-badge"
+                                              th:classappend="${post.full} ? 'full'"
+                                              th:text="${post.full} ? '마감' : |모집 ${post.appliedCount}/${post.capacity}|">모집 0/5</span>
                                         <a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
                                         <!-- [10주차] 단계 5 : 댓글 수 (@OneToMany comments 가 있어야 동작, 글마다 SQL 1번 → N+1) -->
                                         <span th:if="${post.comments.size() > 0}" class="comment-count"

@@ -18,6 +18,8 @@
                     <div class="board-bar">
                         <a th:href="@{/}" class="brand">Nayeon</a>
                         <a th:href="@{/board}">게시판</a>
+                        <!-- [11주차] 신청 바구니 + 배지 (세션에 담긴 모집글 수) -->
+                        <a sec:authorize="isAuthenticated()" th:href="@{/cart}">신청 바구니 <span class="badge rounded-pill bg-secondary" th:text="${cartCount}">0</span></a>
                         <span class="ms-auto"><strong sec:authentication="name">student1</strong>님</span>
                     </div>
 
@@ -30,8 +32,9 @@
                         <div th:if="${error}" th:text="${error}" class="alert alert-danger"></div>
 
                         <!-- 폼 전송 주소 : 글쓰기 POST /board/write , 수정 POST /board/{id}/edit -->
+                        <!-- [11주차] enctype="multipart/form-data" : 글자와 파일을 조각(part)으로 나눠 함께 보낸다 (없으면 파일 이름만) -->
                         <form th:action="${editMode} ? @{/board/{id}/edit(id=${postId})} : @{/board/write}"
-                              method="post" class="custom-form board-form">
+                              method="post" enctype="multipart/form-data" class="custom-form board-form">
                             <div class="form-floating mb-3">
                                 <input type="text" name="title" id="title" class="form-control" placeholder="제목" maxlength="100"
                                        th:value="${postForm?.title}">
@@ -42,11 +45,40 @@
                                           th:text="${postForm?.content}"></textarea>
                                 <label for="content">내용</label>
                             </div>
+
+                            <!-- [11주차] 특강·스터디 모집 (글쓰기에서만) : 정원을 넣으면 모집글, 비우면 일반 글 -->
+                            <div th:unless="${editMode}" class="recruit-fields mb-3">
+                                <h6 class="mb-3"><i class="bi-people me-2"></i>특강·스터디 모집 <small class="text-muted">(선택)</small></h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="capacity" class="form-label">모집 인원</label>
+                                        <input type="number" name="capacity" id="capacity" class="form-control" min="1" max="100"
+                                               placeholder="비우면 일반 글" th:value="${postForm?.capacity}">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="poster" class="form-label">포스터 이미지 (jpg · png · gif · webp, 5MB 까지)</label>
+                                        <input type="file" name="poster" id="poster" class="form-control" accept="image/*">
+                                        <div id="posterHint" class="form-text"></div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="d-flex gap-2 justify-content-end">
                                 <a th:href="${editMode} ? @{/board/{id}(id=${postId})} : @{/board}" class="custom-btn custom-border-btn btn">취소</a>
                                 <button type="submit" class="custom-btn btn" th:text="${editMode} ? '수정 완료' : '등록'">등록</button>
                             </div>
                         </form>
+                        <!-- 크기 제한 ① 브라우저 : 고르는 순간 알려 주는 안내용 (우회 가능 → 서버 max-file-size 가 진짜 제한) -->
+                        <script>
+                            const poster = document.getElementById('poster');
+                            if (poster) poster.addEventListener('change', () => {
+                                const f = poster.files[0], hint = document.getElementById('posterHint');
+                                if (f && f.size > 5 * 1024 * 1024) {
+                                    hint.textContent = '파일이 5MB 를 넘습니다 (' + (f.size / 1024 / 1024).toFixed(1) + 'MB). 서버가 거부합니다.';
+                                    hint.className = 'form-text text-danger';
+                                } else { hint.textContent = ''; }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
