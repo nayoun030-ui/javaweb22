@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 목록</title>
+</head>
+<body>
+    <h1>User List</h1>
+    <!-- [4주차] th:each : users 목록의 개수만큼 tr 을 반복 출력 -->
+    <table border="1">
+        <tr>
+            <th>아이디(기본키)</th>
+            <th>이름</th>
+            <!-- [4주차 연습문제] 나이, 성별 제목 칸 추가 -->
+        </tr>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.name}"></td>
+            <!-- [4주차 연습문제] 나이, 성별 값 칸 추가 -->
+        </tr>
+    </table>
+    <a href="/">메인으로 돌아가기</a>
+</body>
+</html>

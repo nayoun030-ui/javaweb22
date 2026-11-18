@@ -27,7 +27,8 @@ Spring Boot 기반 개인 포트폴리오 웹 사이트 — 주차별 실습 결
 - [x] 3주차 : 포트폴리오 프론트 (TemplateMo 578 First Portfolio, Bootstrap 5) 적용, 정적 자원 경로 Thymeleaf `@{...}` 변환
 - [x] 3주차 : 내 정보로 내용 수정 (Hero · About · Information · Services 4개 · Contact), 상세 페이지 `public/detailed_web.html`
 - [ ] 3주차 연습문제 : 나머지 서비스 3개(AI · 디자인 · 앱) 상세 페이지, 프로필 사진 교체
-- [ ] 4주차 : TestDB 엔티티 · 리포지토리 · 서비스 · 컨트롤러
+- [x] 4주차 : MVC 폴더 구조(controller · model/domain · repository · service), TestDB 엔티티 · 리포지토리 · 서비스, `/testdb` 회원 목록(th:each)
+- [ ] 4주차 연습문제 : 나이 · 성별 컬럼 추가, INSERT 후 testdb.html 출력
 - [ ] 5주차 : 로그인 / 로그아웃, 비밀번호 암호화 (BCrypt)
 - [ ] 6주차 : 권한(ROLE) 접근 제어, 관리자 페이지
 - [ ] 7주차 : 회원 관리 REST API (JSON)
