@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원 관리 | 관리자</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-12 mx-auto">
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0 text-danger"><i class="bi-shield-lock me-2"></i>회원 관리</h2>
+                            <span class="ms-3 small text-muted">
+                                관리자 <strong sec:authentication="name">admin</strong>
+                                <code th:text="${#authentication.authorities.?[authority.startsWith('ROLE_')].![authority]}">[ROLE_ADMIN]</code>
+                            </span>
+                            <a th:href="@{/}" class="ms-auto">메인으로</a>
+                        </div>
+
+                        <!-- redirect 후 1회만 표시되는 flash 메시지 (PRG) -->
+                        <div th:if="${message}" th:text="${message}" class="alert alert-success"></div>
+                        <div th:if="${error}" th:text="${error}" class="alert alert-danger"></div>
+
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>번호</th><th>아이디</th><th>이름</th><th>권한</th><th>권한 변경</th><th>삭제</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="m : ${members}">
+                                    <td th:text="${m.id}">1</td>
+                                    <td th:text="${m.username}">student1</td>
+                                    <td th:text="${m.name}">김학생</td>
+                                    <td><span class="badge"
+                                              th:classappend="${m.role == 'ADMIN'} ? 'bg-danger' : 'bg-secondary'"
+                                              th:text="${m.role}">USER</span></td>
+                                    <td>
+                                        <!-- POST /admin/members/{id}/role , select name="role" → @RequestParam String role -->
+                                        <form th:action="@{/admin/members/{id}/role(id=${m.id})}" method="post" class="d-flex gap-2 m-0">
+                                            <select name="role" class="form-select form-select-sm" style="width: auto;">
+                                                <option value="USER" th:selected="${m.role == 'USER'}">USER</option>
+                                                <option value="ADMIN" th:selected="${m.role == 'ADMIN'}">ADMIN</option>
+                                                <!-- [6주차 연습문제 ②] 서버 화이트리스트에 MANAGER 를 추가하면 허용된다 -->
+                                                <option value="MANAGER" th:selected="${m.role == 'MANAGER'}">MANAGER</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">변경</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form th:action="@{/admin/members/{id}/delete(id=${m.id})}" method="post" class="m-0"
+                                              onsubmit="return confirm('정말 삭제할까요?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

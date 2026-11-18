@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>403 접근 거부</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding d-flex align-items-center" style="min-height: 100vh;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-8 col-12 mx-auto text-center">
+                    <div class="services-thumb">
+                        <h1 class="text-danger mb-2"><i class="bi-slash-circle me-2"></i>403</h1>
+                        <h3 class="mb-4">접근 권한이 없습니다</h3>
+
+                        <!-- 로그인은 했지만 권한(인가)이 부족할 때 : 시큐리티가 이 화면을 보여 준다 -->
+                        <table class="table text-start align-middle">
+                            <tr><th style="width: 35%;">아이디</th><td sec:authentication="name">student1</td></tr>
+                            <tr><th>내 권한</th><td><code th:text="${#authentication?.authorities?.?[authority.startsWith('ROLE_')]?.![authority]}">[ROLE_USER]</code></td></tr>
+                            <tr><th>요청 주소</th><td><code th:text="${path}">/admin/members</code></td></tr>
+                        </table>
+
+                        <a th:href="@{/}" class="custom-btn btn mt-2">메인으로 돌아가기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

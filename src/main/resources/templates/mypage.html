@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내 정보 | 김나연</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+</head>
+<body>
+    <main class="section-padding d-flex align-items-center" style="min-height: 100vh;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-8 col-12 mx-auto">
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0"><i class="bi-person-badge me-2"></i>내 정보</h2>
+                            <a th:href="@{/}" class="ms-auto">메인으로</a>
+                        </div>
+
+                        <!-- DB 에 저장된 값 (MemberController 가 넘긴 member) -->
+                        <table class="table align-middle">
+                            <tr><th style="width: 35%;">번호</th><td th:text="${member.id}">1</td></tr>
+                            <tr><th>아이디</th><td th:text="${member.username}">student1</td></tr>
+                            <tr><th>이름</th><td th:text="${member.name}">김학생</td></tr>
+                            <tr>
+                                <th>권한 (DB)</th>
+                                <td><span class="badge"
+                                          th:classappend="${member.role == 'ADMIN'} ? 'bg-danger' : 'bg-secondary'"
+                                          th:text="${member.role}">USER</span></td>
+                            </tr>
+                            <tr>
+                                <!-- 로그인하는 순간 세션에 복사된 권한 → DB 를 바꿔도 다시 로그인해야 반영 -->
+                                <th>권한 (세션)</th>
+                                <td><code th:text="${#authentication.authorities.?[authority.startsWith('ROLE_')].![authority]}">[ROLE_USER]</code></td>
+                            </tr>
+                        </table>
+
+                        <p class="mb-0 small text-muted">
+                            비밀번호는 BCrypt 해시로만 저장되어 화면에 표시하지 않습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

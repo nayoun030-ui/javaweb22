@@ -1,6 +1,9 @@
 package com.example.demo.model.service;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,5 +47,40 @@ public class MemberService implements UserDetailsService { // 로그인을 위�
                 .password(member.getPassword()) // 암호화 값 → matches() 로 시큐리티가 비교
                 .roles(member.getRole()) // USER → ROLE_USER
                 .build();
+    }
+
+    // ===================== [6주차] 권한 관리 =====================
+
+    // 관리자가 부여할 수 있는 권한 (화면에서 넘어온 값을 그대로 믿지 않는다 : 화이트리스트)
+    // [6주차 연습문제 ②] MANAGER 권한 추가
+    private static final List<String> ROLES = List.of("USER", "ADMIN");
+
+    public Member findByUsername(String username) { // 로그인한 아이디로 회원 조회 (/mypage)
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다 : " + username));
+    }
+
+    public List<Member> findAll() { // 전체 회원 (id 순서)
+        return memberRepository.findAll(Sort.by("id"));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')") // 관리자만 실행 가능 (2차 잠금)
+    public void changeRole(Long id, String role) { // 권한 변경
+        if (!ROLES.contains(role)) { // ① 허용된 권한만 (개발자도구로 SUPER 를 보내도 거부)
+            throw new IllegalArgumentException("허용되지 않는 권한입니다 : " + role);
+        }
+        Member member = memberRepository.findById(id) // ② 없는 번호 → 예외
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+        // [6주차 연습문제 ①] 관리자 본인 보호 : 대상이 로그인한 본인이면 거부
+        member.setRole(role);
+        memberRepository.save(member); // ③ id 가 있으면 UPDATE
+    }
+
+    @PreAuthorize("hasRole('ADMIN')") // 관리자만 실행 가능 (2차 잠금)
+    public void deleteMember(Long id) { // 회원 삭제
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+        // [6주차 연습문제 ①] 관리자 본인 보호 : 대상이 로그인한 본인이면 거부
+        memberRepository.delete(member); // DELETE
     }
 }

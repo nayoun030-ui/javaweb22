@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration // 스프링 설정 클래스 등록
 @EnableWebSecurity // 스프링 시큐리티 활성화
+@EnableMethodSecurity // [6주차] 메서드 보안 활성화 : @PreAuthorize 사용 (없으면 그냥 무시된다)
 public class SecurityConfig {
 
     @Bean // 비밀번호 암호화 객체 등록 (BCrypt 해시)
@@ -24,7 +26,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/hello", "/hello2", "/detailed_web.html",
                                  "/login", "/signup", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**").permitAll() // 빠지면 디자인 깨짐
-                .anyRequest().authenticated()) // 나머지 전부 로그인 필요 → /testdb
+                .requestMatchers("/admin/**").hasRole("ADMIN") // [6주차] 관리자만 (1차 잠금, anyRequest 보다 위에!)
+                .anyRequest().authenticated()) // 나머지 전부 로그인 필요 → /testdb, /mypage
             .formLogin(form -> form // 2. 폼 로그인 설정 (인증)
                 .loginPage("/login") // 기본 화면 대신 우리 로그인 화면
                 .defaultSuccessUrl("/") // 성공 시 메인 (원래 가려던 곳 우선)
