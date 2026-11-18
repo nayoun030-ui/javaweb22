@@ -33,7 +33,19 @@ Spring Boot 기반 개인 포트폴리오 웹 사이트 — 주차별 실습 결
 - [ ] 5주차 연습문제 : ① 로그인 상태 유지 (remember-me) ② 비밀번호 확인 검증
 - [x] 6주차 : 권한(ROLE) 접근 제어 3단계 (화면 sec:authorize · URL hasRole · 메서드 @PreAuthorize), 내 정보 `/mypage`, 관리자 회원 관리 `/admin/members`, 403 화면
 - [ ] 6주차 연습문제 : ① 관리자 본인 보호 ② MANAGER 권한 추가 (/testdb 는 ADMIN · MANAGER 만)
-- [ ] 7주차 : 회원 관리 REST API (JSON)
+- [x] 7주차 : 회원 관리 REST API (JSON) — `@RestController`, 응답 DTO(record), Basic 인증, 상태 코드(200·201·204·400·401·403·404), fetch 화면 `/admin/members-api`
+- [ ] 7주차 연습문제 : ① 회원 검색 API (`?keyword=`) ② `@RestControllerAdvice` 로 오류 처리 모으기
+
+### 7주차 API 테스트 결과 (Postman / curl, Basic 인증)
+| 요청 | 계정 | 결과 |
+|---|---|---|
+| `GET /api/hello` | 없음 | 200 `{"message":"안녕하세요, REST API!", ...}` |
+| `GET /api/me` | 없음 / student2 / 틀린 비밀번호 | 401 / 200 (password 없음) / 401 |
+| `GET /api/admin/members` | student2 / admin | 403 / 200 |
+| `GET /api/admin/members/9999` | admin | 404 |
+| `POST /api/admin/members` (JSON) | admin | 201 + `Location`, 같은 아이디 400, 빈 값 400, 폼 전송 415, `"role":"ADMIN"` 몰래 넣어도 USER |
+| `PATCH /api/admin/members/{id}/role` | admin | `{"role":"ADMIN"}` 200, `{"role":"SUPER"}` 400, PUT 405 |
+| `DELETE /api/admin/members/{id}` | student2 / admin | 403 / 204 → 다시 조회 404 |
 - [ ] 9주차 : 게시판 CRUD + 본인 확인
 - [ ] 10주차 : 페이징 · 검색 · 댓글
 - [ ] 11주차 : 파일 업로드 · 신청 바구니 · 트랜잭션

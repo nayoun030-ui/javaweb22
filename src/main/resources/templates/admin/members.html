@@ -21,7 +21,8 @@
                                 관리자 <strong sec:authentication="name">admin</strong>
                                 <code th:text="${#authentication.authorities.?[authority.startsWith('ROLE_')].![authority]}">[ROLE_ADMIN]</code>
                             </span>
-                            <a th:href="@{/}" class="ms-auto">메인으로</a>
+                            <a th:href="@{/admin/members-api}" class="ms-auto me-3">API 버전으로 보기</a> <!-- [7주차] -->
+                            <a th:href="@{/}">메인으로</a>
                         </div>
 
                         <!-- redirect 후 1회만 표시되는 flash 메시지 (PRG) -->

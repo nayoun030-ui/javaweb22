@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원 관리 (API) | 관리자</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
+    <style>
+        .api-log { font-family: ui-monospace, Consolas, monospace; font-size: 13px; max-height: 520px; overflow-y: auto; }
+        .api-log .entry { border-bottom: 1px solid var(--border-color); padding: 6px 0; word-break: break-all; }
+        .code-2 { color: #14b789; } .code-4 { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <main class="section-padding">
+        <div class="container">
+            <div class="row g-4">
+
+                <!-- 왼쪽 : 회원 관리 (페이지 새로고침 없이 fetch 로 API 호출) -->
+                <div class="col-lg-8 col-12">
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-4 pb-3">
+                            <h2 class="mb-0 text-danger"><i class="bi-braces me-2"></i>회원 관리 <small class="fs-6 text-muted">API 버전</small></h2>
+                            <a th:href="@{/admin/members}" class="ms-auto me-3">기존 화면</a>
+                            <a th:href="@{/}">메인으로</a>
+                        </div>
+
+                        <!-- 회원 등록 : POST /api/admin/members -->
+                        <form id="createForm" class="row g-2 mb-4">
+                            <div class="col-md-3"><input name="username" class="form-control form-control-sm" placeholder="아이디"></div>
+                            <div class="col-md-3"><input name="password" type="password" class="form-control form-control-sm" placeholder="비밀번호"></div>
+                            <div class="col-md-3"><input name="name" class="form-control form-control-sm" placeholder="이름"></div>
+                            <div class="col-md-3"><button type="submit" class="btn btn-sm btn-outline-secondary w-100">등록 (POST)</button></div>
+                        </form>
+
+                        <table class="table align-middle">
+                            <thead>
+                                <tr><th>번호</th><th>아이디</th><th>이름</th><th>권한</th><th>권한 변경 (PATCH)</th><th>삭제 (DELETE)</th></tr>
+                            </thead>
+                            <tbody id="rows"><!-- GET /api/admin/members 결과로 채워진다 --></tbody>
+                        </table>
+
+                        <div class="d-flex gap-2">
+                            <button id="reload" class="btn btn-sm btn-outline-secondary">목록 다시 불러오기 (GET)</button>
+                            <button id="notFound" class="btn btn-sm btn-outline-secondary">9999번 조회 (404)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽 : 요청 · 응답 기록창 -->
+                <div class="col-lg-4 col-12">
+                    <div class="services-thumb">
+                        <div class="d-flex align-items-center border-bottom mb-3 pb-2">
+                            <h5 class="mb-0"><i class="bi-terminal me-2"></i>요청 기록</h5>
+                            <button id="clearLog" class="btn btn-sm btn-link ms-auto">지우기</button>
+                        </div>
+                        <div id="log" class="api-log"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 같은 API, 인증만 다르다 : 브라우저는 로그인할 때 받은 세션 쿠키를 자동으로 함께 보낸다 (Postman 은 Basic 인증)
+        const API = '/api/admin/members';
+        const $ = (sel) => document.querySelector(sel);
+
+        function log(method, url, status, body) { // 기록창에 한 줄 추가 (최신이 위)
+            const div = document.createElement('div');
+            div.className = 'entry';
+            const head = document.createElement('div');
+            head.innerHTML = `<strong></strong> <span></span> → <b class="code-${String(status)[0]}"></b>`;
+            head.querySelector('strong').textContent = method;
+            head.querySelector('span').textContent = url;
+            head.querySelector('b').textContent = status;
+            div.appendChild(head);
+            if (body) { const pre = document.createElement('div'); pre.className = 'text-muted'; pre.textContent = body; div.appendChild(pre); }
+            $('#log').prepend(div);
+        }
+
+        async function call(method, url, data) { // fetch + 기록
+            const res = await fetch(url, {
+                method,
+                headers: data ? { 'Content-Type': 'application/json' } : {},
+                body: data ? JSON.stringify(data) : undefined
+            });
+            const text = await res.text(); // 204 는 본문이 없다
+            log(method, url, res.status, text);
+            return { res, json: text ? JSON.parse(text) : null };
+        }
+
+        async function load() { // GET 목록 → 표 다시 그리기 (필요한 부분만 바뀐다)
+            const { json } = await call('GET', API);
+            const tbody = $('#rows');
+            tbody.replaceChildren();
+            for (const m of json) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td></td><td></td><td></td>
+                    <td><span class="badge"></span></td>
+                    <td><div class="d-flex gap-2">
+                          <select class="form-select form-select-sm" style="width:auto">
+                            <option>USER</option><option>ADMIN</option><option>MANAGER</option><option>SUPER</option>
+                          </select>
+                          <button class="btn btn-sm btn-outline-secondary" data-act="role">변경</button></div></td>
+                    <td><button class="btn btn-sm btn-outline-danger" data-act="del">삭제</button></td>`;
+                const td = tr.querySelectorAll('td');
+                td[0].textContent = m.id; td[1].textContent = m.username; td[2].textContent = m.name;
+                const badge = td[3].querySelector('.badge');
+                badge.textContent = m.role;
+                badge.classList.add(m.role === 'ADMIN' ? 'bg-danger' : 'bg-secondary');
+                tr.querySelector('select').value = m.role;
+                tr.querySelector('[data-act=role]').onclick = async () => {
+                    await call('PATCH', `${API}/${m.id}/role`, { role: tr.querySelector('select').value });
+                    load();
+                };
+                tr.querySelector('[data-act=del]').onclick = async () => {
+                    if (!confirm(`${m.username} 회원을 삭제할까요?`)) return;
+                    await call('DELETE', `${API}/${m.id}`);
+                    load();
+                };
+                tbody.appendChild(tr);
+            }
+        }
+
+        $('#createForm').onsubmit = async (e) => { // POST 등록 (빈 칸이면 서버가 400)
+            e.preventDefault();
+            const f = new FormData(e.target);
+            const { res } = await call('POST', API, {
+                username: f.get('username'), password: f.get('password'),
+                passwordConfirm: f.get('password'), name: f.get('name')
+            });
+            if (res.status === 201) { e.target.reset(); load(); }
+        };
+        $('#reload').onclick = load;
+        $('#notFound').onclick = () => call('GET', `${API}/9999`);
+        $('#clearLog').onclick = () => $('#log').replaceChildren();
+        load();
+    </script>
+</body>
+</html>
