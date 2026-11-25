@@ -9,6 +9,7 @@
     <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
     <link th:href="@{/css/templatemo-first-portfolio-style.css}" rel="stylesheet">
     <link th:href="@{/css/board.css}" rel="stylesheet">
+    <link th:href="@{/css/realtime.css}" rel="stylesheet"> <!-- 처리 중 버튼 모양 -->
 </head>
 <body>
     <main class="section-padding">
@@ -34,7 +35,7 @@
                         <!-- 폼 전송 주소 : 글쓰기 POST /board/write , 수정 POST /board/{id}/edit -->
                         <!-- [11주차] enctype="multipart/form-data" : 글자와 파일을 조각(part)으로 나눠 함께 보낸다 (없으면 파일 이름만) -->
                         <form th:action="${editMode} ? @{/board/{id}/edit(id=${postId})} : @{/board/write}"
-                              method="post" enctype="multipart/form-data" class="custom-form board-form">
+                              method="post" enctype="multipart/form-data" class="custom-form board-form" data-busy="저장 중…">
                             <div class="form-floating mb-3">
                                 <input type="text" name="title" id="title" class="form-control" placeholder="제목" maxlength="100"
                                        th:value="${postForm?.title}">
@@ -84,5 +85,7 @@
             </div>
         </div>
     </main>
+    <!-- [화면 상태 ①] 저장 버튼 : 보내는 순간 "저장 중…" (포스터 업로드가 길어도 두 번 안 눌림) -->
+    <script th:src="@{/js/busy.js}"></script>
 </body>
 </html>

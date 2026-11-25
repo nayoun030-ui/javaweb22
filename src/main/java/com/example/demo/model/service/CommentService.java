@@ -31,6 +31,8 @@ public class CommentService {
         return commentRepository.findByPostOrderByIdAsc(post);
     }
 
+    // [12주차 연습문제 ②] 댓글 알림 : 글쓴이에게 "OO님이 '…' 에 댓글을 남겼습니다." (내 글에 내 댓글은 생략)
+    //   → 이벤트를 던져도 이 메서드엔 @Transactional 이 없어서 @TransactionalEventListener 가 실행되지 않는다 (함정)
     public Comment write(Long postId, String content, String username) { // 댓글 쓰기
         if (content == null || content.isBlank() || content.length() > 500) { // ① 검사
             throw new IllegalArgumentException("댓글은 1~500자로 입력하세요.");

@@ -56,7 +56,7 @@
                                     <td class="num" th:text="${post.id}">1</td>
                                     <td class="title">
                                         <!-- [11주차] 모집글 : 제목 앞 "모집 0/5" 또는 "마감" -->
-                                        <span th:if="${post.recruit}" class="recruit-badge"
+                                        <span th:if="${post.recruit}" class="recruit-badge" th:attr="data-seat-post=${post.id}" data-seat="badge"
                                               th:classappend="${post.full} ? 'full'"
                                               th:text="${post.full} ? '마감' : |모집 ${post.appliedCount}/${post.capacity}|">모집 0/5</span>
                                         <a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a>
@@ -94,5 +94,7 @@
             </div>
         </div>
     </main>
+    <!-- [12주차] 실시간 : 제목 앞 "모집 n/정원" 배지가 새로고침 없이 바뀐다 -->
+    <div th:replace="~{fragments/realtime :: realtime}"></div>
 </body>
 </html>

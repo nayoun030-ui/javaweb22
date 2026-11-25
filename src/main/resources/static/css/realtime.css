@@ -1,0 +1,42 @@
+/* [12주차] 실시간 표시 : 연결 상태 · 종 · 알림 · 숫자 강조 (피그마 컬러보드 토큰) */
+:root { --rt-teal: #0E8E9B; --rt-teal-tint: #DDF4F6; --rt-dark: #222222; --rt-muted: #6B6B6B; --rt-line: #DDDDDD; --rt-flash: #FFE08A; --rt-red: #E4473D; }
+
+.rt-dock { position: fixed; top: 12px; right: 18px; z-index: 1050; display: flex; align-items: center; gap: 8px; }
+.rt-status { background: #FFFFFF; border: 1px solid var(--rt-line); color: var(--rt-muted); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 0, 0, .06); }
+.rt-status.on { color: var(--rt-teal); background: var(--rt-teal-tint); border-color: transparent; }
+.rt-bell { position: relative; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--rt-line); background: #FFFFFF; color: var(--rt-dark); display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0, 0, 0, .06); }
+.rt-bell:focus-visible { outline: 2px solid var(--rt-teal); outline-offset: 2px; }
+.rt-bell-count { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--rt-red); color: #FFFFFF; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
+
+.rt-toasts { position: fixed; right: 18px; bottom: 18px; z-index: 1050; display: flex; flex-direction: column; gap: 10px; width: min(360px, calc(100vw - 36px)); }
+.rt-toast { display: flex; align-items: flex-start; gap: 12px; padding: 14px 14px 14px 16px; border-radius: 16px; background: #FFFFFF; color: var(--rt-dark); text-decoration: none; border: 1px solid var(--rt-line); box-shadow: 0 16px 40px rgba(5, 51, 61, .16); animation: rt-in .25s ease-out; transition: opacity .5s, transform .5s; }
+.rt-toast:hover { color: var(--rt-dark); border-color: var(--rt-teal); }
+.rt-toast-ico { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--rt-teal-tint); color: var(--rt-teal); display: grid; place-items: center; }
+.rt-toast-text { flex: 1; font-size: 14px; line-height: 1.5; }
+.rt-toast-close { border: 0; background: none; color: var(--rt-muted); font-size: 18px; line-height: 1; padding: 0 2px; }
+.rt-toast.rt-hide { opacity: 0; transform: translateY(8px); }
+@keyframes rt-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* 숫자가 바뀌면 노랗게 반짝 */
+.rt-flash { animation: rt-flash 1.2s ease-out; border-radius: 6px; }
+@keyframes rt-flash { 0% { background: var(--rt-flash); } 100% { background: transparent; } }
+
+@media (prefers-reduced-motion: reduce) { .rt-toast, .rt-flash { animation: none; } }
+.nv-page .rt-dock { top: 84px; } /* 메인은 위에 메뉴가 있어서 그 아래로 */
+
+/* [화면 상태 ②] 다시 연결 중 · 연결 안 됨 · 안내 띠 · 오래된 숫자 */
+.rt-status.retry { color: #7A5B00; background: #FFF1B8; border-color: transparent; }
+.rt-status.off { color: var(--rt-muted); background: #FFFFFF; }
+.rt-banner { position: fixed; top: 0; left: 0; right: 0; z-index: 1060; display: flex; align-items: center; gap: 12px; padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); background: #FFF1B8; color: #7A5B00; font-size: 14px; font-weight: 500; box-shadow: 0 4px 14px rgba(0, 0, 0, .06); }
+.rt-banner[hidden] { display: none; }
+.rt-banner span { flex: 1; }
+.rt-banner button { border: 0; border-radius: 999px; background: var(--rt-dark); color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 7px 14px; }
+.rt-stale [data-seat="applied"], .rt-stale [data-seat="remaining"], .rt-stale[data-seat="badge"], .rt-stale [data-seat="remaining-cart"] { color: #A0A0A0 !important; }
+.rt-stale [data-seat="bar"] { filter: grayscale(1); opacity: .6; }
+
+/* [화면 상태 ①] 처리 중 버튼 */
+button.is-busy { opacity: .6; cursor: progress; pointer-events: none; }
+.busy-spin { display: inline-block; width: 1em; height: 1em; margin-right: .45em; vertical-align: -0.15em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: busy-spin .7s linear infinite; }
+@keyframes busy-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .busy-spin { animation-duration: 2s; } }
+.rt-offline .rt-dock, .rt-offline.nv-page .rt-dock { top: 72px; } /* 안내 띠가 있을 때 상태 표시를 띠 아래로 */

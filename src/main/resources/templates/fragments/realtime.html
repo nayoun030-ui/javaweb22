@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<!-- [12주차] 실시간 알림 조각 : board/list · detail · cart · index 맨 아래에서 th:replace 로 끼운다 -->
+<th:block th:fragment="realtime">
+    <link th:href="@{/css/realtime.css}" rel="stylesheet">
+
+    <!-- 오른쪽 위 : 연결 상태 (단계 1) + 종 (로그인한 사람만, 단계 4) -->
+    <div class="rt-dock" id="rt-dock">
+        <span class="rt-status" id="rt-status" aria-live="polite">○ 실시간 연결 중…</span>
+        <button type="button" class="rt-bell" id="rt-bell" sec:authorize="isAuthenticated()" aria-label="알림">
+            <i class="bi-bell"></i><span class="rt-bell-count" id="rt-bell-count" hidden>0</span>
+        </button>
+    </div>
+
+    <!-- [화면 상태 ②] 연결이 끊겼을 때 맨 위 안내 띠 (한 번이라도 연결됐다가 끊긴 경우만) -->
+    <div class="rt-banner" id="rt-banner" role="status" hidden>
+        <strong aria-hidden="true">!</strong>
+        <span>실시간 연결이 끊겼어요. 지금 보이는 남은 자리는 최신이 아닐 수 있어요.</span>
+        <button type="button" onclick="location.reload()">↻ 새로고침</button>
+    </div>
+
+    <!-- 오른쪽 아래 : 개인 알림 토스트가 쌓이는 곳 -->
+    <div class="rt-toasts" id="rt-toasts" aria-live="polite"></div>
+
+    <!-- 로그인한 사람만 개인 알림(/user/queue/notifications)을 구독한다 -->
+    <script sec:authorize="isAuthenticated()">window.RT_LOGIN = true;</script>
+    <script th:inline="javascript">window.RT_CTX = /*[[@{/}]]*/ '/';</script>
+    <script th:src="@{/js/realtime.js}"></script>
+    <!-- [화면 상태 ①] data-busy 폼 : 보내는 순간 버튼을 "처리 중" 으로 -->
+    <script th:src="@{/js/busy.js}"></script>
+</th:block>
+</body>
+</html>

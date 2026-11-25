@@ -79,6 +79,20 @@ Spring Boot 기반 개인 포트폴리오 웹 사이트 — 주차별 실습 결
 | 바구니 | 담기 · 같은 글 두 번 · 다른 사람 · 비로그인 | 배지 숫자 (중복 없음) · 빈 바구니 (세션이 다름) · 로그인 화면 |
 | 신청 확정 | A 확정 → A 다시 | "1개 … 확정" A 1/5 → "이미 신청한 모집글입니다" |
 | 트랜잭션 | B · C 확정 중 C 마감 (student3 이 먼저) | "정원이 마감되었습니다 : C", **B 0/5 (롤백)** → C 빼고 다시 확정 → B 1/5 |
+- [x] 메인 화면 : 피그마 '컬러 시안 v1 · 메인' 적용 (포스터형 히어로, 숫자 4칸 DB 값, 벤토 Services, 유리 카드 Contact) — `HomeController`, `css/nayeon-v1.css`
+- [x] 12주차 : WebSocket + STOMP 실시간 알림 — `/ws` 연결(같은 사이트만), 남은 자리 `/topic/seats` (모두에게), 개인 알림 `/user/queue/notifications` (모집글 쓴 사람에게만), `@TransactionalEventListener` 로 **커밋 뒤에만** 전송 (롤백되면 유령 메시지 없음)
+- [ ] 12주차 연습문제 : ① 신청 취소도 실시간 ② 댓글 알림 (CommentService.write() 에 @Transactional 필요)
+
+### 12주차 실시간 테스트 결과 (비로그인 · admin · student3 세 연결로 동시에 확인)
+| # | 하는 일 | 결과 |
+|---|---|---|
+| 연결 | `/ws` Origin 우리 사이트 / 다른 사이트 | 101 Switching Protocols / 403 |
+| 1 | student2 가 admin 의 모집글 A 확정 | 세 연결 모두 남은 자리 4 · admin 에게만 "Kim님이 '…A' 에 신청했습니다. (1/5)" |
+| 2 | B · C 확정 중 C 마감 (롤백) | 화면 "정원이 마감되었습니다 : C" · **메시지 · 알림 모두 없음** (B 남은 자리 5 그대로) |
+| 3 | C 빼고 B 다시 확정 | 남은 자리 4 · admin 알림 |
+| 4 | admin 이 자기 글에 신청 | 남은 자리만, 본인 알림 없음 |
+| 화면 | 상세를 열어 둔 채 다른 사람이 신청 | 새로고침 없이 신청 3 · 남은 자리 2 · 60%, 숫자가 노랗게 반짝 |
+- 강의 제공 코드(`stomp.umd.min.js`)가 없어 `static/js/realtime.js` 에 STOMP 1.2 연결 · 구독을 직접 구현 (CONNECT → CONNECTED → SUBSCRIBE → MESSAGE)
 
 ## 문제 해결 기록
 - MySQL root 비밀번호 분실 → `mysqld --init-file` 로 재설정 (관리자 권한 PowerShell 필요)

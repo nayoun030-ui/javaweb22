@@ -21,6 +21,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // [10주차] 단계 6 : 이 회원이 쓴 글이 있는지 (1개만 찾으면 멈춘다)
     boolean existsByAuthor(Member author);
 
+    // 메인 화면 숫자 : 지금 모집 중인 글 (정원이 있고 아직 덜 찬 글) — 두 칼럼 비교는 메서드 이름으로 못 만들어서 JPQL
+    @Query("SELECT COUNT(p) FROM Post p WHERE p.capacity IS NOT NULL AND p.appliedCount < p.capacity")
+    long countOpenRecruits();
+
     // [9주차 연습문제 ②] 내가 쓴 글 : findBy + Author_Username + OrderByIdDesc
     // [10주차 연습문제 ①] 내가 쓴 글 페이징 : 마지막에 Pageable 만 더하면 Page 가 된다
 }

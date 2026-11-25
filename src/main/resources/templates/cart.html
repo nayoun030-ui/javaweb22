@@ -38,14 +38,14 @@
                                 <tr><th>모집글</th><th class="views">정원</th><th class="views">신청</th><th class="views">남은 자리</th><th class="views">빼기</th></tr>
                             </thead>
                             <tbody>
-                                <tr th:each="p : ${cartPosts}">
+                                <tr th:each="p : ${cartPosts}" th:attr="data-seat-post=${p.id}">
                                     <td class="title"><a th:href="@{/board/{id}(id=${p.id})}" th:text="${p.title}">모집글</a></td>
                                     <td class="views" th:text="${p.capacity}">5</td>
-                                    <td class="views" th:text="${p.appliedCount}">0</td>
-                                    <td class="views remaining" th:classappend="${p.full} ? 'full'"
+                                    <td class="views" data-seat="applied" th:text="${p.appliedCount}">0</td>
+                                    <td class="views remaining" data-seat="remaining-cart" th:classappend="${p.full} ? 'full'"
                                         th:text="${p.full} ? '마감' : ${p.remaining}">5</td>
                                     <td class="views">
-                                        <form th:action="@{/cart/{id}/remove(id=${p.id})}" method="post" class="m-0">
+                                        <form th:action="@{/cart/{id}/remove(id=${p.id})}" method="post" class="m-0" data-busy="빼는 중…">
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">빼기</button>
                                         </form>
                                     </td>
@@ -55,7 +55,7 @@
                         <div th:if="${cartPosts.isEmpty()}" class="board-empty">바구니가 비어 있습니다. 모집글 상세에서 "바구니 담기"를 눌러 보세요.</div>
 
                         <!-- 신청 확정 : POST /cart/confirm → @Transactional (하나라도 실패하면 모두 취소) -->
-                        <form th:unless="${cartPosts.isEmpty()}" th:action="@{/cart/confirm}" method="post" class="text-end mt-3">
+                        <form th:unless="${cartPosts.isEmpty()}" th:action="@{/cart/confirm}" method="post" class="text-end mt-3" data-busy="신청 확정 중…">
                             <button type="submit" class="custom-btn btn"><i class="bi-check2-circle me-1"></i>모두 신청 확정</button>
                         </form>
                     </div>
@@ -83,5 +83,7 @@
             </div>
         </div>
     </main>
+    <!-- [12주차] 실시간 : 바구니의 남은 자리 · 마감 -->
+    <div th:replace="~{fragments/realtime :: realtime}"></div>
 </body>
 </html>
